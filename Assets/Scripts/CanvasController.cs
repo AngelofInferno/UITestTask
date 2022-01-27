@@ -26,6 +26,8 @@ public class CanvasController : MonoBehaviour
     private bool _winScreenActive;
     
     private List<Image> buttonStars;
+
+    [SerializeField] private CanvasGroup _chooseLevelCanvasGroup;
     // Start is called before the first frame update
     void Start()
     {
@@ -35,19 +37,11 @@ public class CanvasController : MonoBehaviour
     private void OnEnable()
     {
         buttonOk.onClick.AddListener(ButtonOkPressed);
-        /*for (int i = 0; i < _chooseLevelButtons.Length; i++)
-        {
-            _chooseLevelButtons[i].onClick.AddListener(delegate { ChooseLevelButtonPressed(i); });
-        }*/
     }
 
     private void OnDisable()
     {
         buttonOk.onClick.RemoveListener(ButtonOkPressed);
-        /*for (int i = 0; i < _chooseLevelButtons.Length; i++)
-        {
-            _chooseLevelButtons[i].onClick.RemoveAllListeners();
-        }*/
     }
 
     // Update is called once per frame
@@ -90,42 +84,54 @@ public class CanvasController : MonoBehaviour
             {
                 buttonStars[i].sprite = _filledStar;
             }
-            /*else
-            {
-                buttonStars[i].sprite = _emptyStar;
-            }*/
-            //buttonStars[i].sprite = 
         }
         _winScreen.SetActive(false);
         _chooseLevelScreen.SetActive(true);
         _winScreenActive = false;
-        buttonStars.Clear();
+        _chooseLevelCanvasGroup.gameObject.SetActive(true);
+        //buttonStars.Clear();
         
     }
 
     public void ChooseLevelButtonPressed(int i)
     {
+        StartCoroutine(FadeOut(0.04f));
+        
         List<Transform> children = new List<Transform>();
         
-
         foreach (Transform child in _chooseLevelButtons[i].transform)
         {
-            //Debug.Log(child.name);
             children.Add(child);
         }
 
+        if (buttonStars != null)
+        {
+            buttonStars.Clear();
+        }
+        else
+        {
+            buttonStars = new List<Image>();
+        }
         for (int j = 0; j < children.Count; j++)
         {
             buttonStars.Add(children[j].gameObject.GetComponent<Image>());
-            //buttonStars.RemoveAt();
         }
         buttonStars.RemoveAt(0);
-        Debug.Log(buttonStars.Count);
-        //buttonStars = _chooseLevelButtons[i].transform.GetChild(1);
-        //Debug.Log(buttonStars.Length);
 
-        //Debug.Log(buttonStars.Length);
-        _chooseLevelScreen.SetActive(false);
+        //_chooseLevelScreen.SetActive(false);
         _testUIScreen.SetActive(true);
+
+        
+    }
+
+    IEnumerator FadeOut(float tick)
+    {
+        while (_chooseLevelCanvasGroup.alpha > 0)
+        {
+            _chooseLevelCanvasGroup.alpha -= tick;
+            yield return null;
+        }
+        _chooseLevelCanvasGroup.alpha = 1f;
+        _chooseLevelCanvasGroup.gameObject.SetActive(false);
     }
 }
